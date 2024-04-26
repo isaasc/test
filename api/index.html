@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+</head>
+<body>
+    <h1>Upload Image</h1>
+    <form id="uploadForm">
+        <input type="file" id="imageInput" accept="image/*">
+        <button type="button" onclick="uploadImage()">Upload</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        function uploadImage() {
+            var fileInput = document.getElementById('imageInput');
+            var file = fileInput.files[0];
+            console.log(file)
+            
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = function () {
+                var imageData = reader.result.split(',')[1];
+
+                fetch('http://127.0.0.1:5000/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: imageData })
+                })
+                .then(response => {response.json(); console.log(response, 'response')})
+                .then(data => {
+                    console.log(data, 'data')
+                    // document.getElementById('result').innerText = data.message;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            };
+            reader.onerror = function (error) {
+                console.error('Error:', error);
+            };
+        }
+    </script>
+</body>
+</html>
